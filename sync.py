@@ -8,6 +8,7 @@ import datetime
 import os
 
 TODOIST_API_TOKEN = os.environ.get("TODOIST_API_TOKEN")
+SKIP_TODOIST_PROJECT_NAMES = ['Alexa Shopping List',]
 
 if TODOIST_API_TOKEN is None:
     raise Exception("Please set your Todoist API token in the TODOIST_API_TOKEN environment variable")
@@ -92,6 +93,9 @@ def main():
     # all
 
     for ti_task in ti_tasks:
+        if ti_task.project.name in SKIP_TODOIST_PROJECT_NAMES:
+            continue
+
         if not ti_task_synced_to_tw(ti_task=ti_task):
             create_tw_task(ti_task=ti_task, tw_cli=tw_cli)
 
