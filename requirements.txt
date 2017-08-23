@@ -1,0 +1,2 @@
+taskw==1.2.0
+pytodoist==2.1.0
