@@ -8,6 +8,8 @@ import datetime
 import os
 
 TODOIST_API_TOKEN = os.environ.get("TODOIST_API_TOKEN")
+
+TODOIST_DEFAULT_PROJECT = "Inbox"
 SKIP_TODOIST_PROJECT_NAMES = ['Alexa Shopping List',]
 
 if TODOIST_API_TOKEN is None:
@@ -59,7 +61,8 @@ def create_tw_task(ti_task, tw_cli):
     print u"added {} from todoist to taskwarrier".format(ti_task.content)
 
 def create_ti_task(tw_task, ti_cli):
-    ti_task = ti_cli.add_task(tw_task['description'])
+    ti_inbox = ti_cli.get_project(TODOIST_DEFAULT_PROJECT)
+    ti_task = ti_inbox.add_task(tw_task['description'])
 
     sync_rec = TodoistTaskWarrierSyncModel.create(
         todoist=ti_task.id,
