@@ -50,7 +50,10 @@ def tw_task_synced_to_ti(tw_task):
         return False
 
 def create_tw_task(ti_task, tw_cli):
-    tw_task = tw_cli.task_add(ti_task.content)
+    project_name = ti_task.project.name
+    if project_name == "Inbox":
+        project_name = None
+    tw_task = tw_cli.task_add(ti_task.content, project=project_name)
 
     sync_rec = TodoistTaskWarrierSyncModel.create(
         todoist=ti_task.id,
@@ -61,8 +64,12 @@ def create_tw_task(ti_task, tw_cli):
     print u"added {} from todoist to taskwarrier".format(ti_task.content)
 
 def create_ti_task(tw_task, ti_cli):
-    ti_inbox = ti_cli.get_project(TODOIST_DEFAULT_PROJECT)
-    ti_task = ti_inbox.add_task(tw_task['description'])
+    project_name = tw_task.get('project', TODOIST_DEFAULT_PROJECT)
+    ti_project = ti_cli.get_project(project_name)
+    if ti_project is None:
+        ti_project = ti_cli.add_project(project_name)
+        print u"Added new todoist project `{}`".format(project_name)
+    ti_task = ti_project.add_task(tw_task['description'])
 
     sync_rec = TodoistTaskWarrierSyncModel.create(
         todoist=ti_task.id,
